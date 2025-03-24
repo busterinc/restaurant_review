@@ -1,0 +1,47 @@
+# Entornos virtuales
+*.env
+*.venv
+.venv/
+env/
+env.bak/
+venv/
+
+# Archivos de compilación de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Archivos de configuración de IDEs y editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de configuración de Python (si usas `pytest`, `tox`, `coverage`, etc.)
+.coverage
+*.coverage
+*.hypothesis/
+.tox/
+nosetests.xml
+coverage.xml
+*.log
+
+# Archivos de base de datos temporales
+*.sqlite3
+*.db
+
+# Archivos de dependencias
+Pipfile.lock
+poetry.lock
+
+# Archivos de Docker (si usas Docker)
+docker-compose.override.yml
+
+# Archivos de test
+tests/__pycache__/
+
+# Archivos de FastAPI
+*.db
+*.bak
