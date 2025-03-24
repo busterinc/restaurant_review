@@ -14,7 +14,6 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 print('SUPABASE_URL.............', SUPABASE_URL)
-print('SUPABASE_KEY.............', SUPABASE_KEY)
 
 
 # Crear cliente de Supabase
@@ -50,7 +49,11 @@ async def add_restaurant(name: str = Body(), url: str = Body(), image: str = Bod
 
         if (isImage and isUrl):
             try:
-                response = supabase.table('restaurant').insert({"name": name, "url": url, "image": image}).execute()
+                isName = supabase.table('restaurant').select('*').eq('name', name).execute()
+                print('isName ::::::::::::::::', isName)
+                print('isName.data[0] ::::::::::::::::', isName.data[0])
+                if isName.data[0]: response = "Ya existe un restaurante con ese nombre"
+                else: response = supabase.table('restaurant').insert({"name": name, "url": url, "image": image}).execute()
                 print('response ::::::::::::::::', response)
             except Exception as e:
                 print('error ::::::::::::::::', e)
@@ -202,8 +205,12 @@ async def add_review(restaurant: str = Body(), name: str = Body(), description: 
         elif len(restaurant) != 36:
             return "El ID de restaurante no coincide con el formato correcto"
         else:
-            response = supabase.table('reviews').insert({"restaurant": restaurant, "name": name, "description": description, "rating": rating}).execute()
-            print('response ::::::::::::::::', response)
+            isName = supabase.table('reviews').select('*').eq('name', name).execute()
+            print('isName ::::::::::::::::', isName)
+            print('isName.data[0] ::::::::::::::::', isName.data[0])
+            if isName.data[0]: response = "Ya existe un reviews con ese nombre"
+            else: response = supabase.table('reviews').insert({"restaurant": restaurant, "name": name, "description": description, "rating": rating}).execute()
+            # print('response ::::::::::::::::', response)
     except Exception as e:
         print('error ::::::::::::::::', e)
         response = str(e)
@@ -229,36 +236,6 @@ async def get_review_slug(slug: str):
         response = str(e)
     
     return response
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Ruta para actualizar Un review por Slug de Supabase
