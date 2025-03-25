@@ -38,6 +38,11 @@ source venv/bin/activate
 4. Instalar las dependencias
 Con el entorno virtual activo, instala las dependencias necesarias con pip:
 
+pip install fastapi
+pip install supabase
+pip install python-dotenv
+pip install uvicorn
+
 pip install -r requirements.txt
 5. Configurar las variables de entorno
 Crea un archivo .env en el directorio raíz del proyecto para almacenar las credenciales de Supabase de manera segura.

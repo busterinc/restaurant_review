@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body, HTTPException
+from fastapi import FastAPI, Body, HTTPException, Depends, Header
 from supabase import create_client, Client
 # from pydantic import BaseModel, AnyUrl
 import os
@@ -6,6 +6,14 @@ from dotenv import load_dotenv
 from typing import Optional
 import uuid
 from src import validators
+
+from pydantic import BaseModel, EmailStr
+
+from fastapi.responses import JSONResponse
+
+# from src import verify_token_route
+# from src import auth
+from src.auth import validate_token, write_token
 
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
@@ -26,10 +34,10 @@ app.version = "1.0.0"
 
 # Ruta para obtener Restaurantes de Supabase
 @app.get("/api/reviews/restaurant", tags=['RESTAURANT'])
-async def get_restaurants():
+async def get_restaurants(limit: Optional[int] = 10, offset: Optional[int] = 0, token: str = Depends(validate_token)):
 
     try:
-        response = supabase.table('restaurant').select('*').execute()
+        response = supabase.table('restaurant').select('*').range(offset, offset + limit - 1).execute()
         print('response ::::::::::::::::', response)
     except Exception as e:
         print('error ::::::::::::::::', e)
@@ -183,10 +191,10 @@ async def delete_restaurant_slug(slug: str):
 
 # Ruta para obtener Restaurantes de Supabase
 @app.get("/api/reviews/review", tags=['REVIEWS'])
-async def get_reviews():
+async def get_reviews(limit: Optional[int] = 10, offset: Optional[int] = 0):
 
     try:
-        response = supabase.table('reviews').select('*').execute()
+        response = supabase.table('reviews').select('*').range(offset, offset + limit - 1).execute()
         print('response ::::::::::::::::', response)
     except Exception as e:
         print('error ::::::::::::::::', e)
@@ -328,3 +336,28 @@ async def delete_review_slug(slug: str):
         response = str(e)
     
     return response
+
+# ::::::::::::::::::::::::::::::::::::::::::::: TOKEN :::::::::::::::::::::::::::::::::::::::
+# Ruta de login que devuelve un token JWT
+class User(BaseModel):
+    username: str
+    email: EmailStr
+
+@app.post("/login", tags=['TOKEN'])
+def login(user: User):
+    print(user.dict())
+
+    user_name = os.getenv("USER_NAME")
+    user_email = os.getenv("USER_EMAIL")
+
+    if user.username == user_name and user.email == user_email:
+        return write_token(user.dict())
+    else:
+        return JSONResponse(content={"message": "User not found"}, status_code=404)
+
+
+@app.post("/verify/token", tags=['TOKEN'])
+def verify_token(Authorization: str = Header(None)):
+    token = Authorization.split(" ")[1]
+    return validate_token(token, output=True)
+    
