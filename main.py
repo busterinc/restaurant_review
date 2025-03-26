@@ -34,7 +34,7 @@ app.version = "1.0.0"
 
 # Ruta para obtener Restaurantes de Supabase
 @app.get("/api/reviews/restaurant", tags=['RESTAURANT'])
-async def get_restaurants(limit: Optional[int] = 10, offset: Optional[int] = 0, token: str = Depends(validate_token)):
+async def get_restaurants(limit: Optional[int] = 10, offset: Optional[int] = 0, token: str = validate_token):
 
     try:
         response = supabase.table('restaurant').select('*').range(offset, offset + limit - 1).execute()
@@ -187,11 +187,13 @@ async def delete_restaurant_slug(slug: str):
     
     return response
 
+
+
 # :::::::::::::::::::::::::::::::: REVIEWS :::::::::::::::::::::::::::::
 
 # Ruta para obtener Restaurantes de Supabase
 @app.get("/api/reviews/review", tags=['REVIEWS'])
-async def get_reviews(limit: Optional[int] = 10, offset: Optional[int] = 0):
+async def get_reviews(limit: Optional[int] = 10, offset: Optional[int] = 0, token: str = validate_token):
 
     try:
         response = supabase.table('reviews').select('*').range(offset, offset + limit - 1).execute()
